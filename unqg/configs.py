@@ -8,6 +8,7 @@
 Config file for UnsupervisedQA
 """
 import os
+import json
 
 HERE = os.path.dirname(os.path.realpath(__file__))
 SEED = 10
@@ -66,7 +67,17 @@ UNMT_BATCH_SIZE = 30
 
 
 # CLOZE MASKS:
+def get_cloze_masks():
+    with open('./ne/ja_ene.json', 'r') as f:
+        data = json.load(f)
+    return data
+
+
 NOUNPHRASE_LABEL = 'NOUNPHRASE'
+CLOZE_MASKS = get_cloze_masks()
+
+
+'''
 CLOZE_MASKS = {
     'PERSON': 'IDENTITYMASK',
     'NORP': 'IDENTITYMASK',
@@ -89,6 +100,7 @@ CLOZE_MASKS = {
     'CARDINAL': 'NUMERICMASK',
     NOUNPHRASE_LABEL: 'NOUNPHRASEMASK'
 }
+'''
 HEURISTIC_CLOZE_TYPE_QUESTION_MAP = {
     'PERSON': ['Who', ],
     'NORP': ['Who', ],
