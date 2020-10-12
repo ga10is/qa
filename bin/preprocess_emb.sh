@@ -34,6 +34,9 @@ SP_ENCODED_TEXT=$MONO_PATH/encoded_wiki.$CODES.txt
 FASTTEXT_DIR=$TOOLS_PATH/fastText
 FASTTEXT=$FASTTEXT_DIR/fasttext
 
+# Dictionary
+DIC_PY_PATH=$WORK_PATH/unqg/dictionary.py
+ENCODED_TEXT_BIN=$MONO_PATH/encoded_wiki.$CODES.pth
 
 
 # Install SentencePiece
@@ -75,18 +78,11 @@ if ! [[ -f "$SP_VOCAB.vocab" && -f "$SP_VOCAB.model" ]]; then
 fi
 echo "Extracted vocabulary: $SP_VOCAB.vocab and $SP_VOCAB.model"
 
-# encode text to index
-if [ ! -f "$SP_ENCODED_TEXT" ]; then
+# encode text to index and binarize data
+if [ ! -f "$ENCODED_TEXT_BIN" ]; then
     echo "Encoding text..."
-    python $SP_PY_PATH encode --input $WIKI_TEXT_PATH --output $SP_ENCODED_TEXT --model $SP_VOCAB.model --output_format id
+    python $DIC_PY_PATH --input $WIKI_TEXT_PATH --bin_path $ENCODED_TEXT_BIN --model_file $SP_VOCAB.model
 fi
-echo "Encoded text to index in : $SP_ENCODED_TEXT"
-
-# spm_train
-# spm_encode
-# spm_decode
-# spm_export_vocab
-
-
+echo "Encoded text to index in : $ENCODED_TEXT_BIN"
 
 # Exec fastText
