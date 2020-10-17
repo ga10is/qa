@@ -14,7 +14,8 @@ CCRAWL_INDEX_PATH=$CCRAWL_PATH/index
 CCRAWL_QUESTION_TEXT=$CCRAWL_PATH/question.txt
 
 # QA site url
-CRAWL_TARGET_URL="detail.chiebukuro.yahoo.co.jp/*"
+# CRAWL_TARGET_URL="detail.chiebukuro.yahoo.co.jp/*"
+CRAWL_TARGET_URL="okwave.jp/qa/*"
 
 echo "Working directory: $WORK_PATH"
 
@@ -41,11 +42,11 @@ if [ ! -d "$INDEX_CLIENT_DIR" ]; then
 fi
 echo "Cloned cdx-index-clinet in:" $INDEX_CLIENT_DIR
 
-# Search index of chiebukuro pages
+# Search index of target pages
 if ls $CCRAWL_INDEX_PATH/prefix* > /dev/null 2>&1; then
     echo "Already downloaded index of pages"
 else
-    echo "Searching index of chiebukuro pages..."
+    echo "Searching index of target pages..."
     python $INDEX_CLIENT_PY_PATH -d $CCRAWL_INDEX_PATH --json $CRAWL_TARGET_URL
 fi
 echo "Downloaded index of pages in:" $CCRAWL_INDEX_PATH
