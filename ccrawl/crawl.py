@@ -2,13 +2,13 @@ import sys
 import os
 import json
 import io
+import re
 import gzip
 from multiprocessing import Pool
 
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
-import spacy
 
 from functools import wraps
 import time
@@ -46,23 +46,27 @@ def extract_question_from_subwarc(page):
     html = download_subwarc(page)
     text = html2text(html)
 
-    sents = sentence_segment(text, nlp)
+    sents = simple_sentence_segment(text)
     questions = extract_question(sents)
 
     return questions
 
 
-# @stop_watch
 def download_subwarc(result):
     """Donwload WARC"""
     offset, length = int(result['offset']), int(result['length'])
     offset_end = offset + length - 1
 
-    url = 'https://commoncrawl.s3.amazonaws.com/%s' % result['filename']
-    extract_range = 'bytes=%d-%d' % (offset, offset_end)
-    response = requests.get(url,
-                            headers={'Range': extract_range}
-                            )
+    try:
+        url = 'https://commoncrawl.s3.amazonaws.com/%s' % result['filename']
+        extract_range = 'bytes=%d-%d' % (offset, offset_end)
+        response = requests.get(url,
+                                headers={'Range': extract_range}
+                                )
+    except Exception as e:
+        print('Error occurred: %s' % str(e))
+        print('skip: %s' % url)
+        return ''
 
     zipped_file = io.BytesIO(response.content)
     unzipped_file = gzip.GzipFile(fileobj=zipped_file)
@@ -96,28 +100,24 @@ def html2text(html):
     return text
 
 
-# @stop_watch
-def sentence_segment(text, nlp):
-    sentences = []
+def simple_sentence_segment(text):
+    escape_char = "\u222f"
+    punct = r"。!?！？"
 
-    for line in text.splitlines():
-        if line == '':
-            continue
+    splitRegex = r"(?<!%s)([%s])(?!%s)" % (escape_char, punct, escape_char)
+    result = re.sub(splitRegex, "\\1\n", text)
+    unescapeRegex = r"(%s)([%s])(%s)" % (escape_char, punct, escape_char)
+    result = re.sub(unescapeRegex, "\\2", result)
+    sentences = [sent.strip() for sent in result.splitlines()]
 
-        try:
-            doc = nlp(line.rstrip())
-        except:
-            continue
-
-        sentences.extend([str(sent) for sent in doc.sents])
     return sentences
 
 
 def extract_question(sentences):
-    q_sentences = []
+    q_sentences = set()
     for sentence in sentences:
         if endswith_question_mark(sentence) and contains_wh(sentence):
-            q_sentences.append(sentence)
+            q_sentences.add(sentence)
 
     return q_sentences
 
@@ -128,10 +128,27 @@ def endswith_question_mark(text):
 
 def contains_wh(text):
     wh_words = ['だれ', '誰', '何', 'どこ', '何処', 'いつ', 'いくつ', 'いくら']
-    for wh_word in wh_words:
-        if wh_word in text:
-            return True
-    return False
+    notwh_words = ['何故', '如何', '何とか', '何も', '何だか', 'いつも', 'いつでも']
+
+    def is_appriciate(text):
+        for wh_word in wh_words:
+            if wh_word in text:
+                return True
+        return False
+
+    def not_appriciate(text):
+        for notwh_word in notwh_words:
+            if notwh_word in text:
+                return True
+        return False
+
+    contains = is_appriciate(text) and not not_appriciate(text)
+    return contains
+
+
+def cleansing(sentence):
+
+    return sentence
 
 
 if __name__ == '__main__':
@@ -140,19 +157,21 @@ if __name__ == '__main__':
     output = sys.argv[2]
     n_proc = 8
 
-    nlp = spacy.load('ja_ginza')
     pages = parse_index(index_dir_path)
-    pages = pages[:50]
+    # pages = pages[:100]
 
+    # main process
     with Pool(n_proc) as pool:
         imap = pool.imap(extract_question_from_subwarc, pages)
-
         result = list(tqdm(imap, total=len(pages)))
-
     # flatten
-    q_sentences = []
-    for q_list in result:
-        q_sentences.extend(q_list)
+    q_sentences = set()
+    for q_set in result:
+        q_sentences = q_sentences.union(q_set)
+
+    # cleansing
+    q_sentences = [cleansing(sent) for sent in q_sentences]
+    q_sentences = [sent for sent in q_sentences if sent is not None]
 
     with open(output, 'w', encoding='utf-8') as f:
         f.write('\n'.join(q_sentences))
