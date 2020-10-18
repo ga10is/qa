@@ -37,11 +37,12 @@ def is_appropriate_cloze(sentence):
     good_char_len = MIN_CLOZE_CHAR_LEN < len(sentence) < MAX_CLOZE_CHAR_LEN
     no_links = not (('https://' in sentence) or ('http://' in sentence))
     # TODO: correct
-    tokens = sentence.split()
-    good_word_lens = all([MIN_CLOZE_WORDSIZE <= len(
-        tok) <= MAX_CLOZE_WORDSIZE for tok in tokens])
-    good_num_tokens = MIN_CLOZE_WORD_LEN <= len(tokens) <= MAX_CLOZE_WORD_LEN
-    return good_char_len and no_links and good_word_lens and good_num_tokens
+    # tokens = sentence.split()
+    # good_word_lens = all([MIN_CLOZE_WORDSIZE <= len(
+    # tok) <= MAX_CLOZE_WORDSIZE for tok in tokens])
+    # good_num_tokens = MIN_CLOZE_WORD_LEN <= len(tokens) <= MAX_CLOZE_WORD_LEN
+    # return good_char_len and no_links and good_word_lens and good_num_tokens
+    return good_char_len and no_links
 
 
 def is_appropriate_answer(answer_text):
