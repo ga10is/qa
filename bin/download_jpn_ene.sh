@@ -5,8 +5,11 @@ cd ../
 
 WORK_PATH=$PWD
 DATA_PATH=$PWD/data
+ENE_PATH=$DATA_PATH/ene
 
-NEN_PREFIX=$DATA_PATH/ja_ene
+mkdir -p $ENE_PATH
+
+NEN_PREFIX=$ENE_PATH/ja_ene
 NEN_TOOL_PATH=$WORK_PATH/ne/extract_ene.py
 
 if [ ! -f "$NEN_PATH" ]; then

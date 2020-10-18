@@ -68,7 +68,7 @@ UNMT_BATCH_SIZE = 30
 
 # CLOZE MASKS:
 def get_cloze_masks():
-    with open('./ne/ja_ene.json', 'r') as f:
+    with open('./data/ene/ja_ene.json', 'r') as f:
         data = json.load(f)
     return data
 
