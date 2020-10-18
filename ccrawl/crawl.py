@@ -130,19 +130,19 @@ def contains_wh(text):
     wh_words = ['だれ', '誰', '何', 'どこ', '何処', 'いつ', 'いくつ', 'いくら']
     notwh_words = ['何故', '如何', '何とか', '何も', '何だか', 'いつも', 'いつでも']
 
-    def is_appriciate(text):
+    def is_appropriate(text):
         for wh_word in wh_words:
             if wh_word in text:
                 return True
         return False
 
-    def not_appriciate(text):
+    def not_appropriate(text):
         for notwh_word in notwh_words:
             if notwh_word in text:
                 return True
         return False
 
-    contains = is_appriciate(text) and not not_appriciate(text)
+    contains = is_appropriate(text) and not not_appropriate(text)
     return contains
 
 
