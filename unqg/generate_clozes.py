@@ -22,7 +22,7 @@ nlp = spacy.load(SPACY_MODEL)
 
 def mask_answer(text, answer_text, answer_start, answer_type):
     before, after = text[:answer_start], text[answer_start + len(answer_text):]
-    return before + CLOZE_MASKS[answer_type] + after
+    return before + CLOZE_MASKS.get(answer_type, 'IDENTITYMASK') + after
 
 
 def noun_phrase_answer_generator(sent):
