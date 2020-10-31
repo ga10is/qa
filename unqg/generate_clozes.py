@@ -33,16 +33,17 @@ def named_entity_answer_generator(sent):
     return [(e.text, e.start_char - sent.start_char, e.label_) for e in sent.ents]
 
 
-def is_appropriate_cloze(sentence):
+def is_appropriate_cloze(sentence_span):
+    sentence = sentence_span.text
     good_char_len = MIN_CLOZE_CHAR_LEN < len(sentence) < MAX_CLOZE_CHAR_LEN
     no_links = not (('https://' in sentence) or ('http://' in sentence))
-    # TODO: correct
     # tokens = sentence.split()
     # good_word_lens = all([MIN_CLOZE_WORDSIZE <= len(
     # tok) <= MAX_CLOZE_WORDSIZE for tok in tokens])
-    # good_num_tokens = MIN_CLOZE_WORD_LEN <= len(tokens) <= MAX_CLOZE_WORD_LEN
+    good_num_tokens = MIN_CLOZE_WORD_LEN <= len(
+        sentence_span) <= MAX_CLOZE_WORD_LEN
     # return good_char_len and no_links and good_word_lens and good_num_tokens
-    return good_char_len and no_links
+    return good_char_len and no_links and good_num_tokens
 
 
 def is_appropriate_answer(answer_text):
@@ -86,7 +87,7 @@ def generate_clozes_from_paragraph(paragraph, answer_generator):
     clozes = []
     para_doc = nlp(paragraph.text)
     for sentence in para_doc.sents:
-        is_good = is_appropriate_cloze(sentence.text)
+        is_good = is_appropriate_cloze(sentence)
         if is_good:
             answers = answer_generator(sentence)
             for answer_text, answer_start, answer_type in answers:

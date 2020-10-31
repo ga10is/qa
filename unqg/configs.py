@@ -16,12 +16,12 @@ SEED = 10
 
 # Sensible filter thresholds:
 # Cloze selection criteria
-MIN_CLOZE_WORD_LEN = 5
+MIN_CLOZE_WORD_LEN = 10  # orginal:5
 MAX_CLOZE_WORD_LEN = 100  # orginal:40
 MIN_CLOZE_WORDSIZE = 1
 MAX_CLOZE_WORDSIZE = 20
 MIN_CLOZE_CHAR_LEN = 10  # original: 30
-MAX_CLOZE_CHAR_LEN = 300
+MAX_CLOZE_CHAR_LEN = 200  # original: 300
 MIN_ANSWER_WORD_LEN = 1
 MAX_ANSWER_WORD_LEN = 20
 MIN_ANSWER_CHAR_LEN = 1  # original: 3
