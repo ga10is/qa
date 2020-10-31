@@ -6,16 +6,18 @@ import scipy
 from tqdm import tqdm
 
 from . import core
+from .documents import SimpleDocuments
+from ..unqg.sp import SentencePieceTokenizer
 
 from typing import List
 
 
 class Indexer:
 
-    def __init__(self, ngram):
+    def __init__(self, ngram=2):
         self.ngram = ngram
 
-    def doc_to_tfidf_matrix(self, docs):
+    def doc_to_tfidf_matrix(self, docs: List[List[str]]):
 
         count_matrix = get_count_matrix(docs,
                                         ngram=self.ngram,
@@ -118,13 +120,39 @@ def get_doc_freqs(cnts):
 
 
 def main():
-    docs = ['I have a pen pen pen',
-            'This is a pen pen pen',
-            'I am a man']
-    docs = [doc.split() for doc in docs]
-    tfidf_matrix = doc_to_tfidf_matrix(docs)
+    # Register texts to Documents
+    documents = SimpleDocuments()
+    path = 'data/text/wiki_00.txt'
+    n_lines = core.count_lines(path)
+    with open(path, 'r', encoding='utf-8') as f:
+        for i, line in enumerate(tqdm(f, total=n_lines)):
+            line = line.rstrip()
+            if line == '':
+                continue
+            documents.add(line)
+            if i > 100:
+                break
+
+    documents.to_json('data/qas/documents.json')
+    print('save documents as json')
+
+    tokenizer = SentencePieceTokenizer('data/qas/spm.3000.model', 'id')
+    texts = tokenizer.tokenize(documents.get_texts())
+    indexer = Indexer()
+    indexer.doc_to_tfidf_matrix(texts)
+    index_data = indexer.to_dict()
+    core.Pickle.pickle(index_data, 'data/qas/index.pkl')
+
+
+def main_from_encoded_text():
+    with open('path', 'r', encoding='utf-8') as f:
+        texts = f.readlines()
+    texts = [text.split() for text in texts]
+    indexer = Indexer()
+    tfidf_matrix = indexer.doc_to_tfidf_matrix(texts)
     print('tfidf_matrix', tfidf_matrix)
 
 
 if __name__ == '__main__':
+    print(__package__)
     main()

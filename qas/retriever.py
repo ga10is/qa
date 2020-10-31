@@ -1,11 +1,14 @@
+import code
 import unicodedata
 import functools
 
 import numpy as np
 import scipy
 
-from ..unqg.sp import SentencePieceTokenizer
+from unqg.sp import SentencePieceTokenizer
+from . import core
 from .indexer import count
+from .documents import SimpleDocuments, Documents
 
 
 class Retriever:
@@ -29,6 +32,16 @@ class Retriever:
     def closest_docs(self, query, k=1):
         query_vec = self.to_vec(query)
         res = query_vec * self.tfidf_matrix
+
+        if len(res.data) <= k:
+            o_sort = np.argsort(-res.data)
+        else:
+            o = np.argpartition(-res.data, k)[0:k]
+            o_sort = o[np.argsort(-res.data[o])]
+
+        doc_scores = res.data[o_sort]
+        doc_idxs = res.indices[o_sort]
+        return doc_idxs, doc_scores
 
 
 def get_count_vec(tokens, ngram, hash_size):
@@ -70,12 +83,37 @@ def get_tfidf_vec(count_vec, doc_freqs, num_docs):
     return vec
 
 
+def print_retrieve_result(docs: Documents, doc_indices, doc_scores):
+    """
+    Parameters
+    ----------
+    docs: dict
+        {doc_id: doc_text}
+    """
+    doc_texts = [docs.get_text_by_idx(idx) for idx in doc_indices]
+    for doc_text in doc_texts:
+        print(doc_text)
+
+
 def main():
+    # load documents
+    documents = SimpleDocuments.load('data/qas/documents.json')
+
+    # initialize retriever
+    core.Pickle.load('data/qas/index.pkl')
     normalizer = functools.partial(func=unicodedata.normalize, __form='NFKC')
-    tokenizer = SentencePieceTokenizer('', 'id')
+    tokenizer = SentencePieceTokenizer('data/qas/spm.3000.model', 'id')
     r = Retriever(normalizer, tokenizer)
-    r.to_vec(query)
+
+    # retrieve
+    query = ''
+    doc_indices, doc_scores = r.closest_docs(query)
+
+    # print
+    print_retrieve_result(documents, doc_indices, doc_scores)
 
 
 if __name__ == '__main__':
+    banner = 'retrive document'
+    code.interact(banner, local=locals())
     main()

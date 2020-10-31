@@ -1,3 +1,4 @@
+import pickle
 from sklearn.utils import murmurhash3_32
 
 from typing import List
@@ -14,3 +15,29 @@ def get_ngrams(n, tokens: List[str]):
 def hash(token, num_buckets):
     """Unsigned 32 bit murmurhash for feature hashing."""
     return murmurhash3_32(token, positive=True) % num_buckets
+
+
+class Pickle:
+    @staticmethod
+    def pickle(obj, path):
+        with open(path, 'wb') as f:
+            pickle.dump(obj, f)
+
+    @staticmethod
+    def load(path):
+        with open(path, 'rb') as f:
+            data = pickle.load(f)
+        return data
+
+
+def count_lines(path, blocksize=65536):
+    def blocks(f):
+        while True:
+            b = f.read(blocksize)
+            if b:
+                yield b
+            else:
+                break
+
+    with open(path, 'r') as f:
+        return sum(bl.count('\n') for bl in blocks(f))
