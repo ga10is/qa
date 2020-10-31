@@ -34,6 +34,17 @@ class SentencePieceTokenizer:
         self.out_type = out_type
 
     def tokenize(self, text):
+        """
+        Parameters
+        ----------
+        text: str or list of str
+
+        Return
+        ------
+        tokens list
+            list of str if text argument is str,
+            list of list of str if text argument is list of str
+        """
         tokens = self.sp.encode(text, out_type=self.out_type)
         return tokens
 
