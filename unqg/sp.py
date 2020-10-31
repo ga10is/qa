@@ -18,6 +18,7 @@ def spm_encode(args):
     out_type = int if args.output_format == 'id' else str
     sp = spm.SentencePieceProcessor(model_file=args.model)
 
+    # TODO: devide reading
     with open(args.input, 'r', encoding='utf-8') as f:
         lines = f.readlines()
     encoded_lines = sp.encode(lines, out_type=out_type)
@@ -25,6 +26,16 @@ def spm_encode(args):
 
     with open(args.output, 'w', encoding='utf-8') as f:
         f.writelines(encoded_lines)
+
+
+class SentencePieceTokenizer:
+    def __init__(self, model_file, out_type):
+        self.sp = spm.SentencePieceProcessor(model_file=model_file)
+        self.out_type = out_type
+
+    def tokenize(self, text):
+        tokens = self.sp.encode(text, out_type=self.out_type)
+        return tokens
 
 
 def spm_decode(args):
