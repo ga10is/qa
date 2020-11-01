@@ -40,7 +40,8 @@ class SimpleDocuments(Documents):
         return self.docs[doc_id]
 
     def get_texts(self):
-        return list(self.docs.values())
+        texts = [self.docs[doc_id] for doc_id in self.doc_ids]
+        return texts
 
     def to_json(self, path):
         with open(path, 'w', encoding='utf-8') as f:
