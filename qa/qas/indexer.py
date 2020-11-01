@@ -131,18 +131,16 @@ def main():
             if line == '':
                 continue
             documents.add(line)
-            if i > 1000_000:
-                break
 
     documents.to_json('data/qas/documents.json')
     print('save documents as json')
 
-    tokenizer = SentencePieceTokenizer('data/qas/spm.30000.model', 'id')
+    tokenizer = SentencePieceTokenizer('data/qas/spm.8000.model', 'id')
     texts = tokenizer.tokenize(documents.get_texts())
     indexer = Indexer()
     indexer.doc_to_tfidf_matrix(texts, n_process=8)
     index_data = indexer.to_dict()
-    core.Pickle.pickle(index_data, 'data/qas/index.pkl')
+    core.Pickle.pickle(index_data, 'data/qas/index.8000.pkl')
 
 
 def main_from_encoded_text():

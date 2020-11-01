@@ -4,7 +4,7 @@ cd `dirname $0`
 cd ../
 
 # Data preprocessing configuration
-CODES=30000
+CODES=8000
 
 # Initialize tools and data paths
 WORK_PATH=$PWD
