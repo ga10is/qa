@@ -102,7 +102,7 @@ def main():
     # initialize retriever
     core.Pickle.load('data/qas/index.pkl')
     normalizer = functools.partial(func=unicodedata.normalize, __form='NFKC')
-    tokenizer = SentencePieceTokenizer('data/qas/spm.3000.model', 'id')
+    tokenizer = SentencePieceTokenizer('data/qas/spm.30000.model', 'id')
     r = Retriever(normalizer, tokenizer)
 
     # retrieve

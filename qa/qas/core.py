@@ -1,4 +1,5 @@
 import pickle
+import hashlib
 from sklearn.utils import murmurhash3_32
 
 from typing import List
@@ -12,9 +13,13 @@ def get_ngrams(n, tokens: List[str]):
     return ngrams
 
 
-def hash(token, num_buckets):
+def hash_murmurhash(text, num_buckets):
     """Unsigned 32 bit murmurhash for feature hashing."""
-    return murmurhash3_32(token, positive=True) % num_buckets
+    return murmurhash3_32(text, positive=True) % num_buckets
+
+
+def hash_sha1(text):
+    return hashlib.sha1(text.encode()).hexdigest()
 
 
 class Pickle:

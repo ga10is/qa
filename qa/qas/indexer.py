@@ -17,12 +17,12 @@ class Indexer:
     def __init__(self, ngram=2):
         self.ngram = ngram
 
-    def doc_to_tfidf_matrix(self, docs: List[List[str]]):
+    def doc_to_tfidf_matrix(self, docs: List[List[str]], n_process=1):
 
         count_matrix = get_count_matrix(docs,
                                         ngram=self.ngram,
                                         hash_size=2 ** 24,
-                                        n_process=1)
+                                        n_process=n_process)
         tfidf_matrix = get_tfidf_matrix(count_matrix)
         doc_freqs = get_doc_freqs(count_matrix)
 
@@ -78,7 +78,8 @@ def count(doc: List[str], doc_idx, ngram, hash_size):
     ngrams = core.get_ngrams(n=ngram, tokens=doc)
 
     # Hash ngrams and count occurences
-    counts = Counter([core.hash(gram, hash_size) for gram in ngrams])
+    counts = Counter([core.hash_murmurhash(gram, hash_size)
+                      for gram in ngrams])
 
     # Return in sparse matrix data format.
     row = list(counts.keys())
@@ -130,16 +131,16 @@ def main():
             if line == '':
                 continue
             documents.add(line)
-            if i > 100:
+            if i > 1000_000:
                 break
 
     documents.to_json('data/qas/documents.json')
     print('save documents as json')
 
-    tokenizer = SentencePieceTokenizer('data/qas/spm.3000.model', 'id')
+    tokenizer = SentencePieceTokenizer('data/qas/spm.30000.model', 'id')
     texts = tokenizer.tokenize(documents.get_texts())
     indexer = Indexer()
-    indexer.doc_to_tfidf_matrix(texts)
+    indexer.doc_to_tfidf_matrix(texts, n_process=8)
     index_data = indexer.to_dict()
     core.Pickle.pickle(index_data, 'data/qas/index.pkl')
 
@@ -149,7 +150,7 @@ def main_from_encoded_text():
         texts = f.readlines()
     texts = [text.split() for text in texts]
     indexer = Indexer()
-    tfidf_matrix = indexer.doc_to_tfidf_matrix(texts)
+    tfidf_matrix = indexer.doc_to_tfidf_matrix(texts, n_process=8)
     print('tfidf_matrix', tfidf_matrix)
 
 
