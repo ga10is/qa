@@ -29,6 +29,6 @@ cd $WORK_PATH
 # Mask wiki text
 if [ ! -f "$MASKED_WIKI_TEXT_PATH" ]; then
     echo "Masking wiki text..."
-    python -m unqg.mask_text --input_file $WIKI_TEXT_PATH --output_file $MASKED_WIKI_TEXT_PATH --use_named_entity_clozes
+    python -m qa.unqg.mask_text --input_file $WIKI_TEXT_PATH --output_file $MASKED_WIKI_TEXT_PATH --use_named_entity_clozes
 fi
 echo "Masked wiki text in: $MASKED_WIKI_TEXT_PATH"

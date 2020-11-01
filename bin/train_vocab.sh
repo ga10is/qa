@@ -12,7 +12,7 @@ DATA_PATH=$PWD/data
 INPUT_TEXT=$1
 
 # SentencePiece
-SP_PY_PATH=$WORK_PATH/unqg/sp.py
+SP_PY_PATH=$WORK_PATH/qa/unqg/sp.py
 SP_VOCAB=$DATA_PATH/spm.$CODES
 
 #

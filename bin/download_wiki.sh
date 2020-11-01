@@ -44,7 +44,7 @@ echo "Extracted wiki data: $WIKI_EXTRACT_PATH"
 # Extract text
 if [ ! -d "$WIKI_TEXTDIR_PATH" ]; then
     echo "Extracting wiki texts from json files..."
-    python -m unqg.wiki $WIKI_EXTRACT_PATH/AA $WIKI_TEXTDIR_PATH $N_PROCESS
+    python -m qa.unqg.wiki $WIKI_EXTRACT_PATH/AA $WIKI_TEXTDIR_PATH $N_PROCESS
 fi
 
 # Concatnate wiki text

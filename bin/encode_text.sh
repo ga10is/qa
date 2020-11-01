@@ -23,17 +23,17 @@ mkdir -p $MONO_PATH
 # wiki/question/concat text
 # WIKI_TEXT_PATH=$DATA_PATH/wiki.txt
 # WIKI_TEXT_PATH=$DATA_PATH/text/wiki_00.txt
-WIKI_TEXT_PATH=$DATA_PATH/wiki_h100.txt
+WIKI_TEXT_PATH=$DATA_PATH/wiki/mask_wiki.txt
 QUESTION_TEXT_PATH=$DATA_PATH/ccrawl/question.txt
 CONCAT_TEXT_PATH=$MONO_PATH/concat.txt
 
 # SentencePiece
-SP_PY_PATH=$WORK_PATH/unqg/sp.py
+SP_PY_PATH=$WORK_PATH/qa/unqg/sp.py
 SP_VOCAB=$MONO_PATH/spm.$CODES
 ENCODED_TEXT=$MONO_PATH/encoded_concat.$CODES.txt
 
 # Dictionary
-DIC_PY_PATH=$WORK_PATH/unqg/dictionary.py
+DIC_PY_PATH=$WORK_PATH/qa/unqg/dictionary.py
 ENCODED_WIKI_BIN=$MONO_PATH/encoded_wiki.$CODES.pth
 ENCODED_QUESTION_BIN=$MONO_PATH/encoded_question.$CODES.pth
 

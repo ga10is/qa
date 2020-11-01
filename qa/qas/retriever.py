@@ -5,7 +5,7 @@ import functools
 import numpy as np
 import scipy
 
-from unqg.sp import SentencePieceTokenizer
+from ..unqg.sp import SentencePieceTokenizer
 from . import core
 from .indexer import count
 from .documents import SimpleDocuments, Documents
