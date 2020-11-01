@@ -5,12 +5,17 @@ import sentencepiece as spm
 
 # def spm_train(text_path, vocab_size=8000):
 def spm_train(args):
-    arg = '--input=%s --model_prefix=%s '\
-        '--vocab_size=%d --character_coverage=%f'\
-        ' --model_type=%s --user_defined_symbols=%s' % (
-            args.input, args.model_prefix,
-            args.vocab_size, args.character_coverage,
-            args.model_type, args.user_defined_symbols)
+    arg_list = []
+    arg_list.append('--input=%s' % args.input)
+    arg_list.append('--model_prefix=%s' % args.model_prefix)
+    arg_list.append('--vocab_size=%d' % args.vocab_size)
+    arg_list.append('--character_coverage=%f' % args.character_coverage)
+    arg_list.append('--model_type=%s' % args.model_type)
+    arg_list.append('--shuffle_input_sentence=%s' %
+                    args.shuffle_input_sentence)
+    if args.input_sentence_size is not None:
+        arg_list.append('--input_sentence_size=%d' % args.input_sentence_size)
+    arg = ' '.join(arg_list)
     spm.SentencePieceTrainer.Train(arg)
 
 
@@ -31,7 +36,7 @@ def spm_encode(args):
 class SentencePieceTokenizer:
     def __init__(self, model_file, out_type):
         self.sp = spm.SentencePieceProcessor(model_file=model_file)
-        self.out_type = out_type
+        self.out_type = int if out_type == 'id' else str
 
     def tokenize(self, text):
         """
@@ -46,6 +51,8 @@ class SentencePieceTokenizer:
             list of list of str if text argument is list of str
         """
         tokens = self.sp.encode(text, out_type=self.out_type)
+        if self.out_type == int:
+            tokens = [str(num) for num in tokens]
         return tokens
 
 
@@ -67,6 +74,9 @@ if __name__ == '__main__':
     parser_train.add_argument(
         '--model_type', default='unigram', choices=['unigram', 'bpe', 'char', 'word'])
     parser_train.add_argument('--user_defined_symbols', type=str, default='')
+    parser_train.add_argument('--input_sentence_size', type=int)
+    parser_train.add_argument('--shuffle_input_sentence',
+                              choices=['true', 'false'], default='true')
     parser_train.set_defaults(handler=spm_train)
 
     # spm_encode command

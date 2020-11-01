@@ -135,23 +135,20 @@ def main():
     documents.to_json('data/qas/documents.json')
     print('save documents as json')
 
-    tokenizer = SentencePieceTokenizer('data/qas/spm.8000.model', 'id')
+    vocab_path = 'data/qas/spm.30000.model'
+    tokenizer = SentencePieceTokenizer(vocab_path, 'piece')
+    print('Loaded vocab in:', vocab_path)
     texts = tokenizer.tokenize(documents.get_texts())
-    indexer = Indexer()
+
+    indexer = Indexer(ngram=2)
     indexer.doc_to_tfidf_matrix(texts, n_process=8)
     index_data = indexer.to_dict()
-    core.Pickle.pickle(index_data, 'data/qas/index.8000.pkl')
 
-
-def main_from_encoded_text():
-    with open('path', 'r', encoding='utf-8') as f:
-        texts = f.readlines()
-    texts = [text.split() for text in texts]
-    indexer = Indexer()
-    tfidf_matrix = indexer.doc_to_tfidf_matrix(texts, n_process=8)
-    print('tfidf_matrix', tfidf_matrix)
+    # save
+    index_path = 'data/qas/index.30000.pkl'
+    core.Pickle.pickle(index_data, index_path)
+    print('Saved index to:', index_path)
 
 
 if __name__ == '__main__':
-    print(__package__)
     main()

@@ -99,6 +99,7 @@ def print_retrieve_result(docs: Documents, doc_indices, doc_scores):
         print('-' * 20)
         print('score:', doc_score)
         print(doc_text)
+        print('')
 
 
 class NFKCNormalizer:
@@ -112,9 +113,14 @@ def initialize():
     documents = SimpleDocuments.load('data/qas/documents.json')
 
     # initialize retriever
-    index_dict = core.Pickle.load('data/qas/index.8000.pkl')
+    index_path = 'data/qas/index.30000.pkl'
+    index_dict = core.Pickle.load(index_path)
+    print('Loaded index in:', index_path)
     normalizer = NFKCNormalizer()
-    tokenizer = SentencePieceTokenizer('data/qas/spm.8000.model', 'id')
+
+    vocab_path = 'data/qas/spm.30000.model'
+    tokenizer = SentencePieceTokenizer(vocab_path, 'piece')
+    print('Loaded vocab in:', vocab_path)
     r = Retriever(normalizer, tokenizer, index_dict)
 
     return r, documents
