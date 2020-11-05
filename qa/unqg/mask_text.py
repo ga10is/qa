@@ -33,11 +33,8 @@ def mask_text(args):
 
     subline_gen = subline_generator(args.input_file, 1000)
     for i, sublines in enumerate(subline_gen):
-        print('Processing text...')
-        sublines = [processed for processed in preprocess_generator(sublines)]
-        print('Dividing text to subclause...')
-        subclauses = [
-            subclause for subclause in subclauses_generator_from_texts(sublines, nlp)]
+        sublines = list(preprocess_generator(sublines))
+        subclauses = list(subclauses_generator(sublines, nlp, n_process=-1))
         masked_sents = list(mask_texts_generator(subclauses,
                                                  nlp,
                                                  answer_generator,
@@ -89,27 +86,24 @@ def contains_diacritical_mark(text):
 #
 
 
-def subclauses_generator_from_texts(texts, nlp):
-    for text in texts:
-        for subclause in subclauses_generator(text, nlp):
-            yield subclause
-
-
-def subclauses_generator(text, nlp):
-    doc = nlp(text)
-    for tokens in doc.sents:
-        exclude_indices = []
-        for token in tokens:
-            # 1つもadvclがないときの対応
-            if token.dep_ == 'advcl' and token.pos_ != 'AUX':
-                subclause, indices = get_subtree(
-                    tokens, token.i, exclude_indices)
-                exclude_indices.extend(indices)
-                yield subclause
-        main_clause = ''.join([token.orth_ for token in tokens
-                               if token.i not in exclude_indices])
-        if main_clause != '':
-            yield main_clause
+def subclauses_generator(texts, nlp, n_process):
+    for doc in nlp.pipe(texts,
+                        # disable=['CompoundSplitter', 'BunsetuRecognizer'],
+                        n_process=n_process,
+                        batch_size=100):
+        for tokens in doc.sents:
+            exclude_indices = []
+            for token in tokens:
+                if token.dep_.startswith('advcl') and token.pos_ != 'AUX':
+                    # if disable CompoundSplitter and BunsetuRecognizer with ginza, advcl of token.dep_ becomes advcl_bunsetu.
+                    subclause, indices = get_subtree(
+                        tokens, token.i, exclude_indices)
+                    exclude_indices.extend(indices)
+                    yield subclause
+            main_clause = ''.join([token.orth_ for token in tokens
+                                   if token.i not in exclude_indices])
+            if main_clause != '':
+                yield main_clause
 
 
 def get_subtree(tokens, subtree_root_idx, exclude):
